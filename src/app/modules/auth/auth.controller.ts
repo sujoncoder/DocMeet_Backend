@@ -6,7 +6,7 @@ import { loginService } from "./auth.service";
 
 
 
-// LOGIN CONTROLER
+// LOGIN controller
 export const login = catchAsync(async (req: Request, res: Response) => {
     const result = await loginService(req.body);
 

@@ -19,7 +19,7 @@ export const createPatient = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-// CREATE ADMIN CONTROLER
+// CREATE ADMIN controller
 export const createAdmin = catchAsync(async (req: Request, res: Response) => {
     const result = await createAdminService(req);
     sendResponse(res, {
@@ -31,7 +31,7 @@ export const createAdmin = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-// CREATE DOCTOR CONTROLER
+// CREATE DOCTOR controller
 export const createDoctor = catchAsync(async (req: Request, res: Response) => {
     const result = await createDoctorService(req);
     sendResponse(res, {
