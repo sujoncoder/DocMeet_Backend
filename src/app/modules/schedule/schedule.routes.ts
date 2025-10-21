@@ -8,5 +8,5 @@ import { createSchedule, deleteSchedule, schedulesForDoctor } from "./schedule.c
 export const scheduleRoutes = Router()
     .get("/", checkAuth(UserRole.DOCTOR, UserRole.DOCTOR), schedulesForDoctor)
 
-    .post("/", createSchedule)
-    .delete("/:id", deleteSchedule)
+    .post("/", checkAuth(UserRole.DOCTOR), createSchedule)
+    .delete("/:id", checkAuth(UserRole.DOCTOR), deleteSchedule)
