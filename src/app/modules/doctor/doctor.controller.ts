@@ -4,7 +4,7 @@ import sendResponse from "../../shared/sendResponse";
 import { doctorFilterableFields } from "./doctor.constant";
 import { HTTP_STATUS } from "../../constants/httpStatus";
 import { pick } from "../../utils/pick";
-import { getAllDoctorService, updateDoctorService } from "./doctor.service";
+import { deleteDoctorService, getAISuggestionService, getAllDoctorService, getDoctorByIdService, softDeleteService, updateDoctorService } from "./doctor.service";
 
 
 // GET ALL DOCTOR CONTROLLER
@@ -36,4 +36,55 @@ export const updateDoctor = catchAsync(async (req: Request, res: Response) => {
         message: "Doctor updated successfully!",
         data: result
     })
+});
+
+
+// GET DOCTOR BY ID CONTROLLER
+export const getDoctorById = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await getDoctorByIdService(id);
+    sendResponse(res, {
+        statusCode: HTTP_STATUS.OK,
+        success: true,
+        message: 'Doctor retrieval successfully',
+        data: result,
+    });
+});
+
+
+// DELETE DOCTOR CONTROLLER
+export const deleteDoctor = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await deleteDoctorService(id);
+    sendResponse(res, {
+        statusCode: HTTP_STATUS.OK,
+        success: true,
+        message: 'Doctor deleted successfully',
+        data: result,
+    });
+});
+
+
+// SOFT DELETE DOCTOR CONTROLLER
+export const softDelete = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await softDeleteService(id);
+    sendResponse(res, {
+        statusCode: HTTP_STATUS.OK,
+        success: true,
+        message: 'Doctor soft deleted successfully',
+        data: result,
+    });
+});
+
+
+// AI- SUGGESTION DOCTOR CONTROLLER
+export const getAISuggestion = catchAsync(async (req: Request, res: Response) => {
+    const result = await getAISuggestionService(req.body);
+    sendResponse(res, {
+        statusCode: HTTP_STATUS.OK,
+        success: true,
+        message: 'AI suggestions fetched successfully',
+        data: result,
+    });
 });
