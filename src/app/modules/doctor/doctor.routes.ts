@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { getAllDoctors } from "./doctor.controller";
+import { getAllDoctor, updateDoctor } from "./doctor.controller";
 
 
 // DOCTOR ROUTES
 export const doctorRoutes = Router()
-    .get("/", getAllDoctors)
+    .get("/", getAllDoctor)
+    .patch("/:id", updateDoctor)
