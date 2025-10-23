@@ -5,7 +5,7 @@ import { scheduleRoutes } from "../modules/schedule/schedule.routes";
 import { doctorScheduleRoutes } from "../modules/doctorSchedule/doctorSchedule.routes";
 import { specialtiesRoutes } from "../modules/specialties/specialties.routes";
 import { doctorRoutes } from "../modules/doctor/doctor.routes";
-import { appointmentRoutes } from "../modules/appointment/appointment.route";
+import { appointmentRoutes } from "../modules/appointment/appointment.routes";
 
 
 // DEFAULT ROUTE

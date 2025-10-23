@@ -1,4 +1,4 @@
-// CUSTOMS API-ERROR CLASS
+// CUSTOMS API ERROR CLASS
 export class ApiError extends Error {
     public statusCode: number;
 

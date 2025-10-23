@@ -6,7 +6,6 @@ import { verifyToken } from "../utils/jwt";
 import { ApiError } from "../errors/ApiError";
 
 
-
 // CHECK AUTH MIDDLEWARE
 export const checkAuth = (...roles: string[]) => async (
     req: Request & { user?: any },
@@ -21,7 +20,6 @@ export const checkAuth = (...roles: string[]) => async (
         };
 
         const verifiedToken = verifyToken(token, SECRET.JWT_ACCESS_SECRET) as JwtPayload;
-
 
         if (roles.length && !roles.includes(verifiedToken.role)) {
             throw new ApiError(403, "You are not permitted to access this route!");

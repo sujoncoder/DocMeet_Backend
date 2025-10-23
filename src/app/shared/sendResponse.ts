@@ -1,5 +1,7 @@
 import { Response } from "express"
 
+
+// SEND RESPONSE HANDLER
 const sendResponse = <T>(res: Response, jsonData: {
     statusCode: number,
     success: boolean,

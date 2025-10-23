@@ -2,11 +2,11 @@ import { Doctor, Prisma, UserStatus } from "@prisma/client";
 import { doctorSearchableFields } from "./doctor.constant";
 import { prisma } from "../../shared/prisma";
 import { IDoctorUpdateInput } from "./doctor.interface";
-import httpStatus from 'http-status';
 import { ApiError } from "../../errors/ApiError";
 import { openai } from "../../config/open-router";
 import { calculatePagination, IOptions } from "../../utils/pagination";
 import { extractJsonFromMessage } from "../../utils/extractJsonFromMessage";
+import { HTTP_STATUS } from "../../constants/httpStatus";
 
 
 // GET ALL DOCTOR SERVICE
@@ -210,7 +210,7 @@ export const softDeleteService = async (id: string): Promise<Doctor> => {
 // GET AI SUGGESTION SERVICE
 export const getAISuggestionService = async (payload: { symptoms: string }) => {
     if (!(payload && payload.symptoms)) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "symptoms is required!")
+        throw new ApiError(HTTP_STATUS.BAD_REQUEST, "symptoms is required!")
     };
 
     const doctors = await prisma.doctor.findMany({

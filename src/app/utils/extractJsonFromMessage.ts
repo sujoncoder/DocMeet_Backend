@@ -1,3 +1,4 @@
+// EXTRACT JSON FROM MESSAGE
 export const extractJsonFromMessage = (message: any) => {
     try {
         const content = message?.content || "";

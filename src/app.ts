@@ -4,15 +4,14 @@ import cokkieParser from "cookie-parser"
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/notFound';
 import config from './config';
-
 import { router } from './app/routes';
+
 
 const app: Application = express();
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true
 }));
-
 
 // APPLICATION LEVEL MIDDLEWARE
 app.use(express.json());
@@ -33,8 +32,8 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 
+// CATCH MIDDLEWARE
 app.use(globalErrorHandler);
-
 app.use(notFound);
 
 export default app;

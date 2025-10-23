@@ -13,7 +13,6 @@ type IOptionsResult = {
     sortOrder: string;
 };
 
-
 // CALCULATE PAGINATION
 export const calculatePagination = (options: IOptions): IOptionsResult => {
     const page: number = Number(options.page) || 1;

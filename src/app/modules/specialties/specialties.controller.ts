@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import httpStatus from "http-status";
 import catchAsync from "../../shared/catchAsync";
 import sendResponse from "../../shared/sendResponse";
 import { createSpecialtiesService, deleteSpecialtiesService, getAllSpecialtiesService } from "./specialties.service";
+import { HTTP_STATUS } from "../../constants/httpStatus";
 
 
 // CREATE SPECIALTIES CONTROLLER
@@ -10,7 +10,7 @@ export const createSpecialties = catchAsync(async (req: Request, res: Response) 
     const result = await createSpecialtiesService(req);
 
     sendResponse(res, {
-        statusCode: httpStatus.OK,
+        statusCode: HTTP_STATUS.OK,
         success: true,
         message: "Specialties created successfully!",
         data: result
@@ -22,7 +22,7 @@ export const createSpecialties = catchAsync(async (req: Request, res: Response) 
 export const getAllSpecialties = catchAsync(async (req: Request, res: Response) => {
     const result = await getAllSpecialtiesService();
     sendResponse(res, {
-        statusCode: httpStatus.OK,
+        statusCode: HTTP_STATUS.OK,
         success: true,
         message: 'Specialties data fetched successfully',
         data: result,
@@ -35,7 +35,7 @@ export const deleteSpecialties = catchAsync(async (req: Request, res: Response) 
     const { id } = req.params;
     const result = await deleteSpecialtiesService(id);
     sendResponse(res, {
-        statusCode: httpStatus.OK,
+        statusCode: HTTP_STATUS.OK,
         success: true,
         message: 'Specialty deleted successfully',
         data: result,

@@ -17,8 +17,7 @@ interface IEnvType {
     JWT_REFRESH_SECRET: string;
     JWT_REFRESH_EXPIRES: string;
     OPENROUTER_API_KEY: string;
-    // ADMIN_EMAIL: string;
-    // ADMIN_PASSWORD: string;
+    STRIPE_SECRET_KEY: string;
 };
 
 // GET VALIDATED ENV FUNCTION
@@ -36,9 +35,8 @@ const getValidatedEnv = (): IEnvType => {
         "JWT_ACCESS_EXPIRES",
         "JWT_REFRESH_SECRET",
         "JWT_REFRESH_EXPIRES",
-        "OPENROUTER_API_KEY"
-        // "ADMIN_EMAIL",
-        // "ADMIN_PASSWORD"
+        "OPENROUTER_API_KEY",
+        "STRIPE_SECRET_KEY"
     ];
 
     requiredKeys.forEach((key) => {
@@ -60,9 +58,8 @@ const getValidatedEnv = (): IEnvType => {
         JWT_ACCESS_EXPIRES: process.env.JWT_ACCESS_EXPIRES as string,
         JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
         JWT_REFRESH_EXPIRES: process.env.JWT_REFRESH_EXPIRES as string,
-        OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY as string
-        // ADMIN_EMAIL: process.env.ADMIN_EMAIL as string,
-        // ADMIN_PASSWORD: process.env.ADMIN_PASSWORD as string,
+        OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY as string,
+        STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string
     };
 };
 
