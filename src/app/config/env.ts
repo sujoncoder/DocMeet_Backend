@@ -18,6 +18,7 @@ interface IEnvType {
     JWT_REFRESH_EXPIRES: string;
     OPENROUTER_API_KEY: string;
     STRIPE_SECRET_KEY: string;
+    WEB_HOOK_SECRET: string;
 };
 
 // GET VALIDATED ENV FUNCTION
@@ -36,7 +37,8 @@ const getValidatedEnv = (): IEnvType => {
         "JWT_REFRESH_SECRET",
         "JWT_REFRESH_EXPIRES",
         "OPENROUTER_API_KEY",
-        "STRIPE_SECRET_KEY"
+        "STRIPE_SECRET_KEY",
+        "WEB_HOOK_SECRET"
     ];
 
     requiredKeys.forEach((key) => {
@@ -59,7 +61,8 @@ const getValidatedEnv = (): IEnvType => {
         JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
         JWT_REFRESH_EXPIRES: process.env.JWT_REFRESH_EXPIRES as string,
         OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY as string,
-        STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string
+        STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
+        WEB_HOOK_SECRET: process.env.WEB_HOOK_SECRET as string
     };
 };
 

@@ -5,9 +5,17 @@ import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/notFound';
 import config from './config';
 import { router } from './app/routes';
+import { handleStripeWebhookEvent } from './app/modules/payment/payment.controller';
 
 
 const app: Application = express();
+
+app.post(
+    "/webhook",
+    express.raw({ type: "application/json" }),
+    handleStripeWebhookEvent
+);
+
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true
