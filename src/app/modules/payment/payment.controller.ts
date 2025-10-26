@@ -4,11 +4,13 @@ import { handleStripeWebhookEventService } from "./payment.service";
 import sendResponse from "../../shared/sendResponse";
 import { stripe } from "../../utils/stripe";
 import { SECRET } from "../../config/env";
+import { HTTP_STATUS } from "../../constants/httpStatus";
 
 
-// HANDLE STRIPE WEB HOOK EVENT CONTROLLER
+// HANDLE WEBHOOK STRIPE EVENT CONTROLLER
 export const handleStripeWebhookEvent = catchAsync(async (req: Request, res: Response) => {
     const sig = req.headers["stripe-signature"] as string;
+
     const webhookSecret = SECRET.WEB_HOOK_SECRET;
 
     let event;
@@ -21,7 +23,7 @@ export const handleStripeWebhookEvent = catchAsync(async (req: Request, res: Res
     const result = await handleStripeWebhookEventService(event);
 
     sendResponse(res, {
-        statusCode: 200,
+        statusCode: HTTP_STATUS.OK,
         success: true,
         message: 'Webhook req send successfully',
         data: result,

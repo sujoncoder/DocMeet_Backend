@@ -1,15 +1,16 @@
 import { Request } from "express";
 import { prisma } from "../../shared/prisma";
-import { uploadToCloudinary } from "../../utils/multerConfig";
 import { Specialties } from "@prisma/client";
+import { uploadToCloudinary } from "../../utils/multerConfig";
 
 
-// CREATE SPECIALTIES SERVICE
-export const createSpecialtiesService = async (req: Request) => {
+// CREATE SPECIALTY SERVICE
+export const createSpecialtyService = async (req: Request) => {
     const file = req.file;
+
     if (file) {
-        const upload = await uploadToCloudinary(file);
-        req.body.icon = upload?.secure_url;
+        const uploadCloudinary = await uploadToCloudinary(file);
+        req.body.icon = uploadCloudinary?.secure_url;
     };
 
     const result = await prisma.specialties.create({
@@ -26,8 +27,8 @@ export const getAllSpecialtiesService = async (): Promise<Specialties[]> => {
 };
 
 
-// DELETE SPECIALTIES SERVICE
-export const deleteSpecialtiesService = async (id: string): Promise<Specialties> => {
+// DELETE SPECIALTY SERVICE
+export const deleteSpecialtyService = async (id: string): Promise<Specialties> => {
     const result = await prisma.specialties.delete({
         where: {
             id,

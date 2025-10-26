@@ -1,11 +1,11 @@
 import { prisma } from "../../shared/prisma";
 import { IJWTPayload } from "../../types/common";
 import { v4 as uuidv4 } from 'uuid';
-import { AppointmentStatus, Prisma, UserRole } from "@prisma/client";
+import { AppointmentStatus, PaymentStatus, Prisma, UserRole } from "@prisma/client";
 import { stripe } from "../../utils/stripe";
-import { calculatePagination, IOptions } from "../../utils/pagination";
-import { ApiError } from "../../errors/ApiError";
+import calculatePagination, { IOptions } from "../../utils/pagination";
 import { HTTP_STATUS } from "../../constants/httpStatus";
+import { ApiError } from "../../errors/ApiError";
 
 
 // CREATE APPOINTMENT SERVICE
@@ -41,7 +41,7 @@ export const createAppointmentService = async (user: IJWTPayload, payload: { doc
                 scheduleId: payload.scheduleId,
                 videoCallingId
             }
-        })
+        });
 
         await tnx.doctorSchedules.update({
             where: {
@@ -53,7 +53,7 @@ export const createAppointmentService = async (user: IJWTPayload, payload: { doc
             data: {
                 isBooked: true
             }
-        })
+        });
 
         const transactionId = uuidv4();
 
@@ -63,7 +63,7 @@ export const createAppointmentService = async (user: IJWTPayload, payload: { doc
                 amount: doctorData.appointmentFee,
                 transactionId
             }
-        })
+        });
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
@@ -91,6 +91,7 @@ export const createAppointmentService = async (user: IJWTPayload, payload: { doc
 
         return { paymentUrl: session.url };
     })
+
 
     return result;
 };
@@ -153,11 +154,11 @@ export const getMyAppointmentService = async (user: IJWTPayload, filters: any, o
         },
         data: result
     }
+
 };
 
-// task get all data from db (appointment data) - admin
 
-// UPDATE APPOINTMENT STATUS SERVICE
+// UPDATE APPOINTMENT STATUS SERVICE 
 export const updateAppointmentStatusService = async (appointmentId: string, status: AppointmentStatus, user: IJWTPayload) => {
     const appointmentData = await prisma.appointment.findUniqueOrThrow({
         where: {
@@ -181,4 +182,117 @@ export const updateAppointmentStatusService = async (appointmentId: string, stat
             status
         }
     });
+};
+
+export const getAllAppointmentService = async (filters: any, options: IOptions) => {
+    const { limit, page, skip } = calculatePagination(options);
+    const { patientEmail, doctorEmail, ...filterData } = filters;
+    const andConditions = [];
+
+    if (patientEmail) {
+        andConditions.push({
+            patient: {
+                email: patientEmail
+            }
+        })
+    }
+    else if (doctorEmail) {
+        andConditions.push({
+            doctor: {
+                email: doctorEmail
+            }
+        })
+    }
+
+    if (Object.keys(filterData).length > 0) {
+        andConditions.push({
+            AND: Object.keys(filterData).map((key) => {
+                return {
+                    [key]: {
+                        equals: (filterData as any)[key]
+                    }
+                };
+            })
+        });
+    };
+
+    const whereConditions: Prisma.AppointmentWhereInput =
+        andConditions.length > 0 ? { AND: andConditions } : {};
+
+    const result = await prisma.appointment.findMany({
+        where: whereConditions,
+        skip,
+        take: limit,
+        orderBy:
+            options.sortBy && options.sortOrder
+                ? { [options.sortBy]: options.sortOrder }
+                : {
+                    createdAt: 'desc',
+                },
+        include: {
+            doctor: true,
+            patient: true
+        }
+    });
+    const total = await prisma.appointment.count({
+        where: whereConditions
+    });
+
+    return {
+        meta: {
+            total,
+            page,
+            limit,
+        },
+        data: result,
+    };
+};
+
+
+// CANCEL UNPAID APPOINTMENT
+export const cancelUnpaidAppointments = async () => {
+    const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000);
+
+    const unPaidAppointments = await prisma.appointment.findMany({
+        where: {
+            createdAt: {
+                lte: thirtyMinAgo
+            },
+            paymentStatus: PaymentStatus.UNPAID
+        }
+    });
+
+    const appointmentIdsToCancel = unPaidAppointments.map(appointment => appointment.id);
+
+    await prisma.$transaction(async (tnx) => {
+        await tnx.payment.deleteMany({
+            where: {
+                appointmentId: {
+                    in: appointmentIdsToCancel
+                }
+            }
+        });
+
+        await tnx.appointment.deleteMany({
+            where: {
+                id: {
+                    in: appointmentIdsToCancel
+                }
+            }
+        });
+
+        for (const unPaidAppointment of unPaidAppointments) {
+            await tnx.doctorSchedules.update({
+                where: {
+                    doctorId_scheduleId: {
+                        doctorId: unPaidAppointment.doctorId,
+                        scheduleId: unPaidAppointment.scheduleId
+                    }
+                },
+                data: {
+                    isBooked: false
+                }
+            })
+        };
+    })
 };

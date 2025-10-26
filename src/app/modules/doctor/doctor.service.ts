@@ -2,11 +2,11 @@ import { Doctor, Prisma, UserStatus } from "@prisma/client";
 import { doctorSearchableFields } from "./doctor.constant";
 import { prisma } from "../../shared/prisma";
 import { IDoctorUpdateInput } from "./doctor.interface";
-import { ApiError } from "../../errors/ApiError";
-import { openai } from "../../config/open-router";
-import { calculatePagination, IOptions } from "../../utils/pagination";
-import { extractJsonFromMessage } from "../../utils/extractJsonFromMessage";
+import calculatePagination, { IOptions } from "../../utils/pagination";
 import { HTTP_STATUS } from "../../constants/httpStatus";
+import { ApiError } from "../../errors/ApiError";
+import openai from "../../config/open-router";
+import { extractJsonFromMessage } from "../../utils/extractJsonFromMessage";
 
 
 // GET ALL DOCTOR SERVICE
@@ -40,17 +40,18 @@ export const getAllDoctorService = async (filters: any, options: IOptions) => {
                 }
             }
         })
-    }
+    };
 
     if (Object.keys(filterData).length > 0) {
         const filterConditions = Object.keys(filterData).map((key) => ({
             [key]: {
                 equals: (filterData as any)[key]
             }
-        }))
-        andConditions.push(...filterConditions)
-    };
+        }));
 
+        andConditions.push(...filterConditions);
+    }
+    ;
     const whereConditions: Prisma.DoctorWhereInput = andConditions.length > 0 ? { AND: andConditions } : {};
 
     const result = await prisma.doctor.findMany({
@@ -64,6 +65,11 @@ export const getAllDoctorService = async (filters: any, options: IOptions) => {
             doctorSpecialties: {
                 include: {
                     specialities: true
+                }
+            },
+            reviews: {
+                select: {
+                    rating: true
                 }
             }
         }
@@ -105,7 +111,7 @@ export const updateDoctorService = async (id: string, payload: Partial<IDoctorUp
                         specialitiesId: specialty.specialtyId
                     }
                 })
-            };
+            }
 
             const createSpecialtyIds = specialties.filter((specialty) => !specialty.isDeleted);
 
@@ -117,7 +123,8 @@ export const updateDoctorService = async (id: string, payload: Partial<IDoctorUp
                     }
                 })
             }
-        };
+
+        }
 
         const updatedData = await tnx.doctor.update({
             where: {
@@ -131,7 +138,9 @@ export const updateDoctorService = async (id: string, payload: Partial<IDoctorUp
                     }
                 }
             }
-        });
+
+            //  doctor - doctorSpecailties - specialities 
+        })
 
         return updatedData
     });
@@ -155,7 +164,8 @@ export const getDoctorByIdService = async (id: string): Promise<Doctor | null> =
                 include: {
                     schedule: true
                 }
-            }
+            },
+            reviews: true
         },
     });
     return result;
@@ -206,8 +216,7 @@ export const softDeleteService = async (id: string): Promise<Doctor> => {
 };
 
 
-
-// GET AI SUGGESTION SERVICE
+// GET AI SUGGESTION
 export const getAISuggestionService = async (payload: { symptoms: string }) => {
     if (!(payload && payload.symptoms)) {
         throw new ApiError(HTTP_STATUS.BAD_REQUEST, "symptoms is required!")

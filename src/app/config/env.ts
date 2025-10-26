@@ -19,6 +19,12 @@ interface IEnvType {
     OPENROUTER_API_KEY: string;
     STRIPE_SECRET_KEY: string;
     WEB_HOOK_SECRET: string;
+    RESET_PASS_SECRET: string;
+    RESET_PASS_TOKEN_EXPIRES_IN: string;
+    RESET_PASS_LINK: string;
+    SMTP_HOST: string;
+    SMTP_PASS: string;
+    SMTP_FROM_EMAIL: string;
 };
 
 // GET VALIDATED ENV FUNCTION
@@ -38,7 +44,13 @@ const getValidatedEnv = (): IEnvType => {
         "JWT_REFRESH_EXPIRES",
         "OPENROUTER_API_KEY",
         "STRIPE_SECRET_KEY",
-        "WEB_HOOK_SECRET"
+        "WEB_HOOK_SECRET",
+        "RESET_PASS_SECRET",
+        "RESET_PASS_TOKEN_EXPIRES_IN",
+        "RESET_PASS_LINK",
+        "SMTP_HOST",
+        "SMTP_PASS",
+        "SMTP_FROM_EMAIL"
     ];
 
     requiredKeys.forEach((key) => {
@@ -62,7 +74,13 @@ const getValidatedEnv = (): IEnvType => {
         JWT_REFRESH_EXPIRES: process.env.JWT_REFRESH_EXPIRES as string,
         OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY as string,
         STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
-        WEB_HOOK_SECRET: process.env.WEB_HOOK_SECRET as string
+        WEB_HOOK_SECRET: process.env.WEB_HOOK_SECRET as string,
+        RESET_PASS_SECRET: process.env.RESET_PASS_SECRET as string,
+        RESET_PASS_TOKEN_EXPIRES_IN: process.env.RESET_PASS_TOKEN_EXPIRES_IN as string,
+        RESET_PASS_LINK: process.env.RESET_PASS_LINK as string,
+        SMTP_HOST: process.env.SMTP_HOST as string,
+        SMTP_PASS: process.env.SMTP_PASS as string,
+        SMTP_FROM_EMAIL: process.env.SMTP_FROM_EMAIL as string,
     };
 };
 

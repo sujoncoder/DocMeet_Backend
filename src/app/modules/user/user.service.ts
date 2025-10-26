@@ -1,23 +1,21 @@
 import { Request } from "express";
-import bcrypt from "bcryptjs";
-import { Admin, Doctor, Prisma, UserRole } from "@prisma/client";
-import { SECRET } from "../../config/env";
 import { prisma } from "../../shared/prisma";
-import { calculatePagination, IOptions } from "../../utils/pagination";
+import bcrypt from "bcryptjs";
+import { Admin, Doctor, Prisma, UserRole, UserStatus } from "@prisma/client";
 import { userSearchableFields } from "./user.constant";
+import { IJWTPayload } from "../../types/common";
 import { uploadToCloudinary } from "../../utils/multerConfig";
+import calculatePagination, { IOptions } from "../../utils/pagination";
 
 
-
-// CREATE PARTIENT SERVICE
+// CREATE PATIENT SERVICE
 export const createPatientService = async (req: Request) => {
-
     if (req.file) {
         const uploadResult = await uploadToCloudinary(req.file)
-        req.body.patient.profilePhoto = uploadResult?.secure_url;
+        req.body.patient.profilePhoto = uploadResult?.secure_url
     };
 
-    const hashPassword = await bcrypt.hash(req.body.password, SECRET.BCRYPT_SALT_ROUND);
+    const hashPassword = await bcrypt.hash(req.body.password, 10);
 
     const result = await prisma.$transaction(async (tnx) => {
         await tnx.user.create({
@@ -26,6 +24,7 @@ export const createPatientService = async (req: Request) => {
                 password: hashPassword
             }
         });
+
         return await tnx.patient.create({
             data: req.body.patient
         })
@@ -37,15 +36,13 @@ export const createPatientService = async (req: Request) => {
 
 // CREATE ADMIN SERVICE
 export const createAdminService = async (req: Request): Promise<Admin> => {
-
     const file = req.file;
-
     if (file) {
-        const uploadResult = await uploadToCloudinary(file);
-        req.body.admin.profilePhoto = uploadResult?.secure_url
-    }
+        const uploadCloudinary = await uploadToCloudinary(file);
+        req.body.admin.profilePhoto = uploadCloudinary?.secure_url
+    };
 
-    const hashedPassword: string = await bcrypt.hash(req.body.password, 10)
+    const hashedPassword: string = await bcrypt.hash(req.body.password, 10);
 
     const userData = {
         email: req.body.admin.email,
@@ -71,14 +68,13 @@ export const createAdminService = async (req: Request): Promise<Admin> => {
 
 // CREATE DOCTOR SERVICE
 export const createDoctorService = async (req: Request): Promise<Doctor> => {
-
     const file = req.file;
-
     if (file) {
-        const uploadResult = await uploadToCloudinary(file);
-        req.body.doctor.profilePhoto = uploadResult?.secure_url
+        const uploadCloudinary = await uploadToCloudinary(file);
+        req.body.doctor.profilePhoto = uploadCloudinary?.secure_url
     };
-    const hashedPassword: string = await bcrypt.hash(req.body.password, 10)
+
+    const hashedPassword: string = await bcrypt.hash(req.body.password, 10);
 
     const userData = {
         email: req.body.doctor.email,
@@ -102,9 +98,9 @@ export const createDoctorService = async (req: Request): Promise<Doctor> => {
 };
 
 
-// GET ALL USER SERVICE
+// GET ALL USER SSERVICE
 export const getAllUserService = async (params: any, options: IOptions) => {
-    const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
+    const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options)
     const { searchTerm, ...filterData } = params;
 
     const andConditions: Prisma.UserWhereInput[] = [];
@@ -118,7 +114,7 @@ export const getAllUserService = async (params: any, options: IOptions) => {
                 }
             }))
         })
-    }
+    };
 
     if (Object.keys(filterData).length > 0) {
         andConditions.push({
@@ -128,7 +124,7 @@ export const getAllUserService = async (params: any, options: IOptions) => {
                 }
             }))
         })
-    }
+    };
 
     const whereConditions: Prisma.UserWhereInput = andConditions.length > 0 ? {
         AND: andConditions
@@ -155,4 +151,116 @@ export const getAllUserService = async (params: any, options: IOptions) => {
         },
         data: result
     };
+};
+
+
+// GET MY PROFILE SERVICE
+export const getMyProfileService = async (user: IJWTPayload) => {
+    const userInfo = await prisma.user.findUniqueOrThrow({
+        where: {
+            email: user.email,
+            status: UserStatus.ACTIVE
+        },
+        select: {
+            id: true,
+            email: true,
+            needPasswordChange: true,
+            role: true,
+            status: true
+        }
+    });
+
+    let profileData;
+
+    if (userInfo.role === UserRole.PATIENT) {
+        profileData = await prisma.patient.findUnique({
+            where: {
+                email: userInfo.email
+            }
+        })
+    }
+    else if (userInfo.role === UserRole.DOCTOR) {
+        profileData = await prisma.doctor.findUnique({
+            where: {
+                email: userInfo.email
+            }
+        })
+    }
+    else if (userInfo.role === UserRole.ADMIN) {
+        profileData = await prisma.admin.findUnique({
+            where: {
+                email: userInfo.email
+            }
+        })
+    }
+
+    return {
+        ...userInfo,
+        ...profileData
+    };
+};
+
+
+// CHANGE PROFILE STATUS SERVICE
+export const changeProfileStatusService = async (id: string, payload: { status: UserStatus }) => {
+    const userData = await prisma.user.findUniqueOrThrow({
+        where: {
+            id
+        }
+    });
+
+    const updateUserStatus = await prisma.user.update({
+        where: {
+            id
+        },
+        data: payload
+    });
+
+    return updateUserStatus;
+};
+
+
+// UPDATE MY PROFILE SERVICE
+export const updateMyProfileService = async (user: IJWTPayload, req: Request) => {
+    const userInfo = await prisma.user.findUniqueOrThrow({
+        where: {
+            email: user?.email,
+            status: UserStatus.ACTIVE
+        }
+    });
+
+    const file = req.file;
+    if (file) {
+        const uploadCloudinary = await uploadToCloudinary(file);
+        req.body.profilePhoto = uploadCloudinary?.secure_url;
+    }
+
+    let profileInfo;
+
+    if (userInfo.role === UserRole.ADMIN) {
+        profileInfo = await prisma.admin.update({
+            where: {
+                email: userInfo.email
+            },
+            data: req.body
+        })
+    }
+    else if (userInfo.role === UserRole.DOCTOR) {
+        profileInfo = await prisma.doctor.update({
+            where: {
+                email: userInfo.email
+            },
+            data: req.body
+        })
+    }
+    else if (userInfo.role === UserRole.PATIENT) {
+        profileInfo = await prisma.patient.update({
+            where: {
+                email: userInfo.email
+            },
+            data: req.body
+        })
+    }
+
+    return { ...profileInfo };
 };

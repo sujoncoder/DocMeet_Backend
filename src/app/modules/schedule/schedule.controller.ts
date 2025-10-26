@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import catchAsync from "../../shared/catchAsync";
 import sendResponse from "../../shared/sendResponse";
+import { createScheduleService, deleteScheduleService, schedulesForDoctorService } from "./schedule.service";
 import { IJWTPayload } from "../../types/common";
+import pick from "../../utils/pick";
 import { HTTP_STATUS } from "../../constants/httpStatus";
-import { createScheduleService, deleteScheduleSerice, schedulesForDoctorService } from "./schedule.service";
-import { pick } from "../../utils/pick";
 
 
 // CREATE SCHEDULE CONTROLLER
@@ -40,12 +40,12 @@ export const schedulesForDoctor = catchAsync(async (req: Request & { user?: IJWT
 
 // DELETE SCHEDULE CONTROLLER
 export const deleteSchedule = catchAsync(async (req: Request, res: Response) => {
-    const result = await deleteScheduleSerice(req.params.id);
+    const result = await deleteScheduleService(req.params.id);
 
     sendResponse(res, {
         statusCode: HTTP_STATUS.OK,
         success: true,
         message: "Schedule deleted successfully!",
         data: result
-    });
+    })
 });

@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import catchAsync from "../../shared/catchAsync";
 import sendResponse from "../../shared/sendResponse";
 import { doctorFilterableFields } from "./doctor.constant";
+import pick from "../../utils/pick";
 import { HTTP_STATUS } from "../../constants/httpStatus";
-import { pick } from "../../utils/pick";
 import { deleteDoctorService, getAISuggestionService, getAllDoctorService, getDoctorByIdService, softDeleteService, updateDoctorService } from "./doctor.service";
 
 
@@ -24,7 +24,7 @@ export const getAllDoctor = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-// UPDATE DOCTOR CONTROLLER
+// UPDATE DOCTOR SERVICE CONTROLLER
 export const updateDoctor = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
 
@@ -35,7 +35,7 @@ export const updateDoctor = catchAsync(async (req: Request, res: Response) => {
         success: true,
         message: "Doctor updated successfully!",
         data: result
-    })
+    });
 });
 
 
@@ -43,6 +43,7 @@ export const updateDoctor = catchAsync(async (req: Request, res: Response) => {
 export const getDoctorById = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await getDoctorByIdService(id);
+
     sendResponse(res, {
         statusCode: HTTP_STATUS.OK,
         success: true,
@@ -56,6 +57,7 @@ export const getDoctorById = catchAsync(async (req: Request, res: Response) => {
 export const deleteDoctor = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await deleteDoctorService(id);
+
     sendResponse(res, {
         statusCode: HTTP_STATUS.OK,
         success: true,
@@ -65,10 +67,11 @@ export const deleteDoctor = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-// SOFT DELETE DOCTOR CONTROLLER
+// SOFT DELETE CONTROLLER
 export const softDelete = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await softDeleteService(id);
+
     sendResponse(res, {
         statusCode: HTTP_STATUS.OK,
         success: true,
@@ -78,9 +81,10 @@ export const softDelete = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-// AI- SUGGESTION DOCTOR CONTROLLER
+// GET AI SUGGESTION CONTROLLER
 export const getAISuggestion = catchAsync(async (req: Request, res: Response) => {
     const result = await getAISuggestionService(req.body);
+
     sendResponse(res, {
         statusCode: HTTP_STATUS.OK,
         success: true,

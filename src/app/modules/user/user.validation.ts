@@ -1,24 +1,20 @@
 import { Gender } from "@prisma/client";
-import { z } from "zod";
+import z from "zod";
 
 
-// CREATE PATIENT ZOD SCHEMA
-export const createPatientValidation = z.object({
+// CREATE PATIENT VALIDATION ZOD SCHEMA
+export const createPatientSchema = z.object({
     password: z.string(),
     patient: z.object({
-        name: z.string({
-            error: "Name is required!"
-        }),
-        email: z.string({
-            error: "Email is required!"
-        }),
-        address: z.string().optional(),
-    }),
+        name: z.string().nonempty("Name is required"),
+        email: z.string().nonempty("Email is required"),
+        address: z.string().optional()
+    })
 });
 
 
-// CREATE ADMIN ZOD SCHEMA
-export const createAdminValidation = z.object({
+// CREATE ADMIN VALIDATION ZOD SCHEMA
+export const createAdminSchema = z.object({
     password: z.string({
         error: "Password is required"
     }),
@@ -36,8 +32,8 @@ export const createAdminValidation = z.object({
 });
 
 
-// CREATE DOCTOR ZOD SCHEMA
-export const createDoctorValidation = z.object({
+// CREATE DOCTOR VALIDATION ZOD SCHEMA
+export const createDoctorSchema = z.object({
     password: z.string({
         error: "Password is required"
     }),

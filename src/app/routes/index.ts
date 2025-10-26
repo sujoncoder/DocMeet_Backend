@@ -1,11 +1,16 @@
 import { Router } from "express";
-import { userRoutes } from "../modules/user/user.route";
-import { authRoutes } from "../modules/auth/auth.route";
-import { scheduleRoutes } from "../modules/schedule/schedule.routes";
+import { AdminRoutes } from "../modules/admin/admin.routes";
+import { AuthRoutes } from "../modules/auth/auth.route";
+import { ScheduleRoutes } from "../modules/schedule/schedule.routes";
 import { doctorScheduleRoutes } from "../modules/doctorSchedule/doctorSchedule.routes";
-import { specialtiesRoutes } from "../modules/specialties/specialties.routes";
-import { doctorRoutes } from "../modules/doctor/doctor.routes";
-import { appointmentRoutes } from "../modules/appointment/appointment.routes";
+import { AppointmentRoutes } from "../modules/appointment/appointment.routes";
+import { MetaRoutes } from "../modules/meta/meta.routes";
+import { ReviewRoutes } from "../modules/review/review.routes";
+import { PrescriptionRoutes } from "../modules/prescription/prescription.routes";
+import { PatientRoutes } from "../modules/patient/patient.routes";
+import { DoctorRoutes } from "../modules/doctor/doctor.routes";
+import { SpecialtiesRoutes } from "../modules/specialties/specialties.routes";
+import { UserRoutes } from "../modules/user/user.route";
 
 
 // DEFAULT ROUTE
@@ -13,34 +18,55 @@ export const router = Router();
 
 const moduleRoutes = [
     {
-        path: "/user",
-        route: userRoutes
+        path: '/user',
+        route: UserRoutes
     },
     {
-        path: "/auth",
-        route: authRoutes
+        path: '/auth',
+        route: AuthRoutes
     },
     {
-        path: "/schedule",
-        route: scheduleRoutes
+        path: '/schedule',
+        route: ScheduleRoutes
     },
     {
-        path: "/doctor-schedule",
+        path: '/doctor-schedule',
         route: doctorScheduleRoutes
     },
     {
         path: '/specialties',
-        route: specialtiesRoutes
+        route: SpecialtiesRoutes
     },
     {
         path: '/doctor',
-        route: doctorRoutes
+        route: DoctorRoutes
+    },
+    {
+        path: '/admin',
+        route: AdminRoutes
+    },
+    {
+        path: '/patient',
+        route: PatientRoutes
     },
     {
         path: '/appointment',
-        route: appointmentRoutes
+        route: AppointmentRoutes
+    },
+    {
+        path: '/prescription',
+        route: PrescriptionRoutes
+    },
+    {
+        path: '/review',
+        route: ReviewRoutes
+    },
+    {
+        path: '/metadata',
+        route: MetaRoutes
     },
 ];
+
 
 // LOOP ALL ROUTE
 moduleRoutes.forEach((route) => {

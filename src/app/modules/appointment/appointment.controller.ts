@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import catchAsync from "../../shared/catchAsync";
-import { createAppointmentService, getMyAppointmentService, updateAppointmentStatusService } from "./appointment.service";
+import { createAppointmentService, getAllAppointmentService, getMyAppointmentService, updateAppointmentStatusService } from "./appointment.service";
 import sendResponse from "../../shared/sendResponse";
 import { IJWTPayload } from "../../types/common";
+import { appointmentFilterableFields } from "./appointment.constant";
+import pick from "../../utils/pick";
 import { HTTP_STATUS } from "../../constants/httpStatus";
-import { pick } from "../../utils/pick";
-
 
 
 // CREATE APPOINTMENT CONTROLLER
@@ -51,5 +51,21 @@ export const updateAppointmentStatus = catchAsync(async (req: Request & { user?:
         success: true,
         message: "Appointment updated successfully!",
         data: result
+    })
+});
+
+
+// GET ALL APPOINTMENT CONTROLLER
+export const getAllAppointment = catchAsync(async (req: Request, res: Response) => {
+    const filters = pick(req.query, appointmentFilterableFields)
+    const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+    const result = await getAllAppointmentService(filters, options);
+
+    sendResponse(res, {
+        statusCode: HTTP_STATUS.OK,
+        success: true,
+        message: 'Appointment retrieval successfully',
+        meta: result.meta,
+        data: result.data,
     });
 });

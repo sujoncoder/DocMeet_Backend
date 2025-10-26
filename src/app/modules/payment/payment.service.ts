@@ -3,7 +3,7 @@ import { prisma } from "../../shared/prisma";
 import { PaymentStatus } from "@prisma/client";
 
 
-// HANDLE STRIPE WEB HOOK EVENT SERVICE
+// HANDLE WEBHOOK STRIPE EVENT SERVICE
 export const handleStripeWebhookEventService = async (event: Stripe.Event) => {
     switch (event.type) {
         case "checkout.session.completed": {
@@ -19,7 +19,7 @@ export const handleStripeWebhookEventService = async (event: Stripe.Event) => {
                 data: {
                     paymentStatus: session.payment_status === "paid" ? PaymentStatus.PAID : PaymentStatus.UNPAID
                 }
-            });
+            })
 
             await prisma.payment.update({
                 where: {

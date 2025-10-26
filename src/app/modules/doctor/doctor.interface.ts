@@ -1,7 +1,6 @@
 import { Gender } from "@prisma/client";
 
-
-// DOCTER UPDATE INPUT DATA TYPE
+// DOCTOR UPDATE INPUT TYPE
 export type IDoctorUpdateInput = {
     email: string;
     contactNumber: string;

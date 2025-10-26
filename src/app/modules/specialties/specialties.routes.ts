@@ -1,20 +1,17 @@
-import { Router, NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
+import { createSpecialty, deleteSpecialty, getAllSpecialties } from './specialties.controller';
+import { CreateSpecialtiesSchema } from './specialties.validation';
 import { UserRole } from '@prisma/client';
-import { upload } from '../../utils/multerConfig';
 import { checkAuth } from '../../middlewares/checkAuth';
-import { createSpecialties, deleteSpecialties, getAllSpecialties } from './specialties.controller';
-import { createSpecialtiesZod } from './specialties.validation';
+import { upload } from '../../utils/multerConfig';
 
 
 // SPECIALTIES ROUTES
-export const specialtiesRoutes = Router()
-
+export const SpecialtiesRoutes = Router()
     .get('/', getAllSpecialties)
     .post('/', upload.single('file'),
         (req: Request, res: Response, next: NextFunction) => {
-            req.body = createSpecialtiesZod.parse(JSON.parse(req.body.data))
-            return createSpecialties(req, res, next)
-        }
-    )
-
-    .delete('/:id', checkAuth(UserRole.ADMIN, UserRole.ADMIN), deleteSpecialties)
+            req.body = CreateSpecialtiesSchema.parse(JSON.parse(req.body.data))
+            return createSpecialty(req, res, next)
+        })
+    .delete('/:id', checkAuth(UserRole.ADMIN, UserRole.ADMIN), deleteSpecialty)

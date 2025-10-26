@@ -2,12 +2,11 @@ import { addMinutes, addHours, format } from "date-fns";
 import { prisma } from "../../shared/prisma";
 import { Prisma } from "@prisma/client";
 import { IJWTPayload } from "../../types/common";
-import { calculatePagination, IOptions } from "../../utils/pagination";
+import calculatePagination, { IOptions } from "../../utils/pagination";
 
 
 // CREATE SCHEDULE SERVICE
 export const createScheduleService = async (payload: any) => {
-
     const { startTime, endTime, startDate, endDate } = payload;
 
     const intervalTime = 30;
@@ -31,46 +30,44 @@ export const createScheduleService = async (payload: any) => {
             addMinutes(
                 addHours(
                     `${format(currentDate, "yyyy-MM-dd")}`,
-                    Number(endTime.split(":")[0])
+                    Number(endTime.split(":")[0]) // 11:00
                 ),
                 Number(endTime.split(":")[1])
             )
-        );
+        )
 
         while (startDateTime < endDateTime) {
-            const slotStartDateTime = startDateTime;
-            const slotEndDateTime = addMinutes(startDateTime, intervalTime);
+            const slotStartDateTime = startDateTime; // 10:30
+            const slotEndDateTime = addMinutes(startDateTime, intervalTime); // 11:00
 
             const scheduleData = {
                 startDateTime: slotStartDateTime,
                 endDateTime: slotEndDateTime
-            };
+            }
 
             const existingSchedule = await prisma.schedule.findFirst({
                 where: scheduleData
-            });
+            })
 
             if (!existingSchedule) {
                 const result = await prisma.schedule.create({
                     data: scheduleData
                 });
                 schedules.push(result)
-            };
+            }
 
             slotStartDateTime.setMinutes(slotStartDateTime.getMinutes() + intervalTime);
         }
+
         currentDate.setDate(currentDate.getDate() + 1)
-    };
+    }
+
     return schedules;
-};
+}
 
 
 // SCHEDULE FOR DOCTOR SERVICE
-export const schedulesForDoctorService = async (
-    user: IJWTPayload,
-    fillters: any,
-    options: IOptions
-) => {
+export const schedulesForDoctorService = async (user: IJWTPayload, fillters: any, options: IOptions) => {
     const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
     const { startDateTime: filterStartDateTime, endDateTime: filterEndDateTime } = fillters;
 
@@ -146,7 +143,7 @@ export const schedulesForDoctorService = async (
 
 
 // DELETE SCHEDULE SERVICE
-export const deleteScheduleSerice = async (id: string) => {
+export const deleteScheduleService = async (id: string) => {
     return await prisma.schedule.delete({
         where: {
             id
